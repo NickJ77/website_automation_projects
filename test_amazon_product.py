@@ -1,34 +1,41 @@
+import time
 from selenium import webdriver
-from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.remote.webelement import WebElement
+import pytest
 
 
 class TestAmazon:
-    driver = ''
+    @pytest.fixture()
+    def test_setup(self):
+        global driver
+        driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
+        driver.implicitly_wait(7)
+        driver.get("https://www.amazon.com/")
+        driver.maximize_window()
+        time.sleep(4)
+        yield
+        driver.quit()
 
-    def setup_method(self):
-        self.driver = webdriver.Chrome(executable_path="/Users/nicholasjames/PycharmProjects/automation_project/chromedriver")
-        self.driver.implicitly_wait(15)
-        self.driver.get("https://www.amazon.com/")
+    def test_search(self, test_setup):
+        search_product = driver.find_element_by_id("twotabsearchtextbox")
+        search_product.send_keys('ecobee smart thermostat')
+        search_product.send_keys(Keys.ENTER)
+        time.sleep(4)
+        thermostat = driver.find_element_by_xpath("//img[@alt='ecobee Smart Thermostat with Voice Control - Black.RFB (Renewed)']")
+        thermostat.click()
 
-    def test_amazon_product_search(self):
-        search = self.driver.find_element(By.ID, "twotabsearchtextbox")
-        search.send_keys('ecobee smart thermostat', Keys.ENTER)
+    def test_menu_bar(self, test_setup):
+        best_sellers = driver.find_element_by_xpath("//div[@id='nav-xshop']//a[contains(@class,'')][normalize-space()='Best Sellers']")
+        best_sellers.click()
+        amazon_basics = driver.find_element_by_xpath("//a[normalize-space()='Amazon Basics']")
+        amazon_basics.click()
+        epic_daily_deals = driver.find_element_by_xpath("//a[normalize-space()='Epic Daily Deals']")
+        epic_daily_deals.click()
+        customer_service = driver.find_element_by_xpath("//a[normalize-space()='Customer Service']")
+        customer_service.click()
 
-        smart_home = self.driver.find_element_by_xpath('//img[@alt="ecobee Lite SmartThermostat, Black"]')
-        smart_home.click()
 
-        ecobee_thermostat = self.driver.find_element_by_id('submit.add-to-cart')
-        ecobee_thermostat.click()
-        self.driver.implicitly_wait(10)
-
-        checkout = self.driver.find_element_by_xpath('//input[@class="a-button-input"]')
-        checkout.click()
-
-    def teardown_method(self):
-        self.driver.back()
-        self.driver.quit()
 
 
 
