@@ -10,8 +10,6 @@ class TestTravelocity():
         destination.send_keys('Orlando')
         search = driver.find_element_by_xpath("//button[normalize-space()='Search']")
         search.click()
-        driver.find_element_by_xpath("(//a[@class='listing__link uitk-card-link'])[6]").click()
-
 
 
 searchlocation = TestTravelocity()
